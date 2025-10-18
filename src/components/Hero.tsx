@@ -82,6 +82,7 @@ const Hero = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1, duration: 0.8 }}
+          className="flex gap-4 justify-center flex-wrap"
         >
           <Button 
             onClick={scrollToContact}
@@ -89,6 +90,16 @@ const Hero = () => {
             className="bg-gradient-to-r from-primary to-secondary hover:opacity-90 transition-opacity text-lg px-8 py-6 glow-primary"
           >
             Let's Connect
+          </Button>
+          <Button
+            size="lg"
+            variant="outline"
+            asChild
+            className="border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+          >
+            <a href="/Prashanth_Resume.pdf" download>
+              Download Resume
+            </a>
           </Button>
         </motion.div>
       </motion.div>

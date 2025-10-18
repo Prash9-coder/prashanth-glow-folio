@@ -85,8 +85,8 @@ const Contact = () => {
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Email</p>
-                  <a href="mailto:prashanth@example.com" className="hover:text-primary transition-colors">
-                    prashanth@example.com
+                  <a href="mailto:nimmalaprashanth9@gmail.com" className="hover:text-primary transition-colors">
+                    nimmalaprashanth9@gmail.com
                   </a>
                 </div>
               </motion.div>
@@ -100,8 +100,8 @@ const Contact = () => {
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Phone</p>
-                  <a href="tel:+1234567890" className="hover:text-secondary transition-colors">
-                    +91 (XXX) XXX-XXXX
+                  <a href="tel:+916300472707" className="hover:text-secondary transition-colors">
+                    +91 6300472707
                   </a>
                 </div>
               </motion.div>
@@ -115,7 +115,7 @@ const Contact = () => {
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Location</p>
-                  <p>India</p>
+                  <p>Warangal, India</p>
                 </div>
               </motion.div>
             </div>
