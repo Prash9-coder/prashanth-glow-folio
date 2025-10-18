@@ -4,50 +4,41 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
 import { useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useMutation } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
 
 const Contact = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
-  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-
-    try {
-      const { error } = await supabase
-        .from("contacts")
-        .insert([
-          {
-            name,
-            email,
-            message,
-          },
-        ]);
-
-      if (error) throw error;
-
+  const createContact = useMutation({
+    mutationFn: async (data: { name: string; email: string; message: string }) => {
+      await apiRequest("POST", "/api/contacts", data);
+    },
+    onSuccess: () => {
       toast.success("Message sent successfully! 🎉", {
         description: "I'll get back to you as soon as possible.",
       });
-
       setName("");
       setEmail("");
       setMessage("");
-    } catch (error) {
+    },
+    onError: () => {
       toast.error("Failed to send message", {
         description: "Please try again later.",
       });
-    } finally {
-      setLoading(false);
-    }
+    },
+  });
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    createContact.mutate({ name, email, message });
   };
 
   return (
-    <section id="contact" className="py-20 px-4">
+    <section id="contact" className="py-20 px-4" data-testid="section-contact">
       <div className="max-w-6xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -85,7 +76,7 @@ const Contact = () => {
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Email</p>
-                  <a href="mailto:nimmalaprashanth9@gmail.com" className="hover:text-primary transition-colors">
+                  <a href="mailto:nimmalaprashanth9@gmail.com" className="hover:text-primary transition-colors" data-testid="link-email">
                     nimmalaprashanth9@gmail.com
                   </a>
                 </div>
@@ -100,7 +91,7 @@ const Contact = () => {
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Phone</p>
-                  <a href="tel:+916300472707" className="hover:text-secondary transition-colors">
+                  <a href="tel:+916300472707" className="hover:text-secondary transition-colors" data-testid="link-phone">
                     +91 6300472707
                   </a>
                 </div>
@@ -115,7 +106,7 @@ const Contact = () => {
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Location</p>
-                  <p>Warangal, India</p>
+                  <p data-testid="text-location">Warangal, India</p>
                 </div>
               </motion.div>
             </div>
@@ -127,7 +118,7 @@ const Contact = () => {
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
           >
-            <form onSubmit={handleSubmit} className="glass-card p-8 space-y-6">
+            <form onSubmit={handleSubmit} className="glass-card p-8 space-y-6" data-testid="form-contact">
               <div>
                 <Input
                   placeholder="Your Name"
@@ -135,6 +126,7 @@ const Contact = () => {
                   onChange={(e) => setName(e.target.value)}
                   required
                   className="bg-background/50"
+                  data-testid="input-name"
                 />
               </div>
               <div>
@@ -145,6 +137,7 @@ const Contact = () => {
                   onChange={(e) => setEmail(e.target.value)}
                   required
                   className="bg-background/50"
+                  data-testid="input-email"
                 />
               </div>
               <div>
@@ -155,14 +148,16 @@ const Contact = () => {
                   required
                   rows={6}
                   className="bg-background/50"
+                  data-testid="input-message"
                 />
               </div>
               <Button
                 type="submit"
-                disabled={loading}
+                disabled={createContact.isPending}
                 className="w-full bg-gradient-to-r from-primary to-secondary hover:opacity-90 transition-opacity"
+                data-testid="button-submit"
               >
-                {loading ? "Sending..." : "Send Message"}
+                {createContact.isPending ? "Sending..." : "Send Message"}
               </Button>
             </form>
           </motion.div>
