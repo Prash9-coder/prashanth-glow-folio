@@ -1,6 +1,8 @@
+import "dotenv/config";
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import { connectDB } from "./db";
 
 const app = express();
 app.use(express.json());
@@ -37,11 +39,19 @@ app.use((req, res, next) => {
 });
 
 (async () => {
-  registerRoutes(app);
-  const server = await setupVite(app);
+  try {
+    // Connect to MongoDB
+    await connectDB();
 
-  const PORT = 5000;
-  server.listen(PORT, "0.0.0.0", () => {
-    log(`Server running on port ${PORT}`);
-  });
+    registerRoutes(app);
+    const server = await setupVite(app);
+
+    const PORT = 5000;
+    server.listen(PORT, "0.0.0.0", () => {
+      log(`Server running on port ${PORT}`);
+    });
+  } catch (error) {
+    console.error("Failed to start server:", error);
+    process.exit(1);
+  }
 })();

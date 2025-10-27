@@ -2,7 +2,7 @@ import type { Config } from "tailwindcss";
 
 export default {
   darkMode: ["class"],
-  content: ["./pages/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}", "./app/**/*.{ts,tsx}", "./src/**/*.{ts,tsx}"],
+  content: ["./client/index.html", "./client/src/**/*.{ts,tsx}"],
   prefix: "",
   theme: {
     container: {
@@ -80,10 +80,74 @@ export default {
             height: "0",
           },
         },
+        "fade-in": {
+          "0%": { opacity: "0" },
+          "100%": { opacity: "1" },
+        },
+        "slide-in-right": {
+          "0%": { transform: "translateX(100%)", opacity: "0" },
+          "100%": { transform: "translateX(0)", opacity: "1" },
+        },
+        "slide-in-left": {
+          "0%": { transform: "translateX(-100%)", opacity: "0" },
+          "100%": { transform: "translateX(0)", opacity: "1" },
+        },
+        "slide-in-up": {
+          "0%": { transform: "translateY(100%)", opacity: "0" },
+          "100%": { transform: "translateY(0)", opacity: "1" },
+        },
+        "slide-in-down": {
+          "0%": { transform: "translateY(-100%)", opacity: "0" },
+          "100%": { transform: "translateY(0)", opacity: "1" },
+        },
+        "bounce-slow": {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-10px)" },
+        },
+        "pulse-glow": {
+          "0%, 100%": { opacity: "1" },
+          "50%": { opacity: "0.8" },
+        },
+        "spin-slow": {
+          "from": { transform: "rotate(0deg)" },
+          "to": { transform: "rotate(360deg)" },
+        },
+        "shimmer-loading": {
+          "0%": { backgroundPosition: "-1000px 0" },
+          "100%": { backgroundPosition: "1000px 0" },
+        },
+        "gradient-shift": {
+          "0%, 100%": { backgroundPosition: "0% 50%" },
+          "50%": { backgroundPosition: "100% 50%" },
+        },
+        "ping-slow": {
+          "75%, 100%": {
+            transform: "scale(2)",
+            opacity: "0",
+          },
+        },
+        "float-up": {
+          "0%": { transform: "translateY(0px)", opacity: "0" },
+          "10%": { opacity: "1" },
+          "90%": { opacity: "1" },
+          "100%": { transform: "translateY(-100vh)", opacity: "0" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "fade-in": "fade-in 0.5s ease-out",
+        "slide-in-right": "slide-in-right 0.5s ease-out",
+        "slide-in-left": "slide-in-left 0.5s ease-out",
+        "slide-in-up": "slide-in-up 0.5s ease-out",
+        "slide-in-down": "slide-in-down 0.5s ease-out",
+        "bounce-slow": "bounce-slow 2s ease-in-out infinite",
+        "pulse-glow": "pulse-glow 2s ease-in-out infinite",
+        "spin-slow": "spin-slow 3s linear infinite",
+        "shimmer-loading": "shimmer-loading 2s infinite",
+        "gradient-shift": "gradient-shift 3s ease infinite",
+        "ping-slow": "ping-slow 2s cubic-bezier(0, 0, 0.2, 1) infinite",
+        "float-up": "float-up 3s ease-out infinite",
       },
     },
   },
