@@ -12,7 +12,9 @@ export async function apiRequest(
   url: string,
   data?: unknown
 ): Promise<Response> {
-  const res = await fetch(url, {
+  const baseUrl = import.meta.env.VITE_API_URL || "";
+  const fullUrl = baseUrl + url;
+  const res = await fetch(fullUrl, {
     method,
     headers: data ? { "Content-Type": "application/json" } : {},
     body: data ? JSON.stringify(data) : undefined,
@@ -23,7 +25,9 @@ export async function apiRequest(
 }
 
 const defaultQueryFn = async ({ queryKey }: { queryKey: readonly unknown[] }) => {
-  const res = await fetch(queryKey[0] as string);
+  const baseUrl = import.meta.env.VITE_API_URL || "";
+  const url = baseUrl + (queryKey[0] as string);
+  const res = await fetch(url);
   await throwIfResNotOk(res);
   return res.json();
 };

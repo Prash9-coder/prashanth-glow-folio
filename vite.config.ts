@@ -8,6 +8,9 @@ export default defineConfig(({ mode, command }) => ({
   root: "client",
   cacheDir: "../node_modules/.vite",
   plugins: [react()],
+  server: {
+    allowedHosts: ["prashanth-glow-folio.onrender.com"],
+  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./client/src"),
