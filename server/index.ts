@@ -11,18 +11,40 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// CORS
-const FRONTEND = "https://prashanth-port-folio.vercel.app";
+// ------------------------------
+// ✅ ALLOWED ORIGINS
+// ------------------------------
+const allowedOrigins = [
+  "https://prashanth-port-folio.vercel.app", // Production frontend
+  "http://localhost:5173",                   // Local development
+  "http://localhost:3000",
+];
 
+// ------------------------------
+// ✅ CORS FIXED COMPLETELY
+// ------------------------------
 app.use(
   cors({
-    origin: FRONTEND,
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        console.log("❌ BLOCKED ORIGIN:", origin);
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    credentials: true,
     allowedHeaders: ["Content-Type", "Authorization", "Accept"],
+    credentials: true,
   })
 );
 
+// 🟢 Preflight OPTIONS support (Fixes CORS errors)
+app.options("*", cors());
+
+// ------------------------------
+// Start Server
+// ------------------------------
 (async () => {
   try {
     await connectDB();
@@ -30,7 +52,7 @@ app.use(
     console.log("REGISTER ROUTES CALLED");
     registerRoutes(app);
 
-    // SAFEST fallback
+    // API fallback
     app.use((req, res, next) => {
       if (req.path.startsWith("/api")) {
         return res.status(404).json({ error: "API route not found" });
@@ -38,7 +60,7 @@ app.use(
       next();
     });
 
-    // ⚠️⚠️⚠️ VITE MUST BE ATTACHED LAST ⚠️⚠️⚠️
+    // Vite must be attached last
     await setupVite(app);
 
     const PORT = Number(process.env.PORT) || 5000;
