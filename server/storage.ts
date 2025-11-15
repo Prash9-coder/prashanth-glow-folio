@@ -6,6 +6,7 @@ import type {
   InsertSponsor,
   Sponsor as SponsorType
 } from "@shared/schema";
+
 import { Project, Contact, Sponsor } from "@shared/schema";
 
 export interface IStorage {
@@ -15,6 +16,7 @@ export interface IStorage {
 
   // Contacts
   createContact(contact: InsertContact): Promise<ContactType>;
+  getContacts(): Promise<ContactType[]>;
 
   // Sponsors
   getSponsors(): Promise<SponsorType[]>;
@@ -22,6 +24,9 @@ export interface IStorage {
 }
 
 export class DbStorage implements IStorage {
+  // -----------------------------
+  // PROJECTS
+  // -----------------------------
   async getProjects(): Promise<ProjectType[]> {
     const projects = await Project.find().sort({ createdAt: -1 }).lean();
     return projects.map(project => ({
@@ -39,52 +44,69 @@ export class DbStorage implements IStorage {
 
   async createProject(project: InsertProject): Promise<ProjectType> {
     const newProject = new Project(project);
-    const savedProject = await newProject.save();
+    const saved = await newProject.save();
     return {
-      _id: savedProject._id.toString(),
-      title: savedProject.title,
-      description: savedProject.description,
-      imageUrl: savedProject.imageUrl,
-      demoUrl: savedProject.demoUrl,
-      githubUrl: savedProject.githubUrl,
-      techStack: savedProject.techStack,
-      featured: savedProject.featured,
-      createdAt: savedProject.createdAt
+      _id: saved._id.toString(),
+      title: saved.title,
+      description: saved.description,
+      imageUrl: saved.imageUrl,
+      demoUrl: saved.demoUrl,
+      githubUrl: saved.githubUrl,
+      techStack: saved.techStack,
+      featured: saved.featured,
+      createdAt: saved.createdAt
     };
+  }
+
+  // -----------------------------
+  // CONTACTS
+  // -----------------------------
+  async getContacts(): Promise<ContactType[]> {
+    const contacts = await Contact.find().sort({ createdAt: -1 }).lean();
+    return contacts.map(c => ({
+      _id: c._id.toString(),
+      name: c.name,
+      email: c.email,
+      message: c.message,
+      createdAt: c.createdAt
+    }));
   }
 
   async createContact(contact: InsertContact): Promise<ContactType> {
     const newContact = new Contact(contact);
-    const savedContact = await newContact.save();
+    const saved = await newContact.save();
     return {
-      _id: savedContact._id.toString(),
-      name: savedContact.name,
-      email: savedContact.email,
-      message: savedContact.message,
-      createdAt: savedContact.createdAt
+      _id: saved._id.toString(),
+      name: saved.name,
+      email: saved.email,
+      message: saved.message,
+      createdAt: saved.createdAt
     };
   }
 
+  // -----------------------------
+  // SPONSORS
+  // -----------------------------
   async getSponsors(): Promise<SponsorType[]> {
     const sponsors = await Sponsor.find().sort({ createdAt: -1 }).lean();
-    return sponsors.map(sponsor => ({
-      _id: sponsor._id.toString(),
-      donorName: sponsor.donorName,
-      message: sponsor.message,
-      amount: sponsor.amount,
-      createdAt: sponsor.createdAt
+    return sponsors.map(s => ({
+      _id: s._id.toString(),
+      donorName: s.donorName,
+      message: s.message,
+      amount: s.amount,
+      createdAt: s.createdAt
     }));
   }
 
   async createSponsor(sponsor: InsertSponsor): Promise<SponsorType> {
     const newSponsor = new Sponsor(sponsor);
-    const savedSponsor = await newSponsor.save();
+    const saved = await newSponsor.save();
     return {
-      _id: savedSponsor._id.toString(),
-      donorName: savedSponsor.donorName,
-      message: savedSponsor.message,
-      amount: savedSponsor.amount,
-      createdAt: savedSponsor.createdAt
+      _id: saved._id.toString(),
+      donorName: saved.donorName,
+      message: saved.message,
+      amount: saved.amount,
+      createdAt: saved.createdAt
     };
   }
 }

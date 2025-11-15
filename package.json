@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "tsx watch --ignore 'client/**/*' --ignore 'dist/**/*' --ignore 'node_modules/**/*' server/index.ts",
+    "dev": "set NODE_OPTIONS=-r tsconfig-paths/register && tsx watch --ignore \"client/**/*\" --ignore \"dist/**/*\" --ignore \"node_modules/**/*\" server/index.ts",
     "seed": "tsx server/seed-projects.ts",
     "build": "vite build",
     "build:dev": "vite build --mode development",
@@ -63,6 +63,7 @@
     "sonner": "^1.7.4",
     "tailwind-merge": "^2.6.0",
     "tailwindcss-animate": "^1.0.7",
+    "tsconfig-paths": "^4.2.0",
     "tsx": "^4.20.6",
     "vaul": "^0.9.9",
     "wouter": "^3.7.1",

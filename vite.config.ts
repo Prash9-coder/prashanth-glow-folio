@@ -13,11 +13,12 @@ export default defineConfig(({ mode, command }) => ({
   },
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "./client/src"),
-      "@shared": path.resolve(__dirname, "./shared"),
-      "@assets": path.resolve(__dirname, "./client/public"),
+      "@": path.resolve(__dirname, "client/src"),
+      "@shared": path.resolve(__dirname, "shared"),
+      "@assets": path.resolve(__dirname, "client/public")
     },
   },
+
   build: {
     outDir: "../dist/public",
     emptyOutDir: true,
