@@ -6,6 +6,7 @@ import {
   insertSponsorSchema,
   Project,
 } from "@shared/schema";
+import nodemailer from "nodemailer";
 
 export function registerRoutes(app: Express) {
   // Debug
@@ -92,12 +93,51 @@ export function registerRoutes(app: Express) {
   });
 
   // CREATE CONTACT
+  // CONTACTS ROUTE (FULLY FIXED)
   app.post("/api/contacts", async (req, res) => {
+    console.log("Incoming Contact Body:", req.body);
+
     try {
-      const validated = insertContactSchema.parse(req.body);
-      const item = await storage.createContact(validated);
-      res.status(201).json(item);
-    } catch (e) {
+      const validatedData = insertContactSchema.parse(req.body);
+
+      const contact = await storage.createContact(validatedData);
+
+      // -----------------------------
+      // EMAIL NOTIFICATION
+      // -----------------------------
+      const transporter = nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+          user: process.env.SMTP_USER,
+          pass: process.env.SMTP_PASS,
+        },
+      });
+
+      const mailOptions = {
+        from: `"Portfolio Contact" <${process.env.SMTP_USER}>`,
+        to: process.env.NOTIFY_EMAIL,
+        subject: `New Contact Request from ${contact.name}`,
+        text: `
+New Contact Request
+
+Name: ${contact.name}
+Email: ${contact.email}
+Message: ${contact.message}
+      `,
+        html: `
+        <h2>New Contact Request</h2>
+        <p><strong>Name:</strong> ${contact.name}</p>
+        <p><strong>Email:</strong> ${contact.email}</p>
+        <p><strong>Message:</strong> ${contact.message}</p>
+      `,
+      };
+
+      await transporter.sendMail(mailOptions);
+
+      return res.status(201).json({ success: true, contact });
+
+    } catch (error) {
+      console.error("Error creating contact:", error);
       res.status(400).json({ error: "Invalid contact data" });
     }
   });

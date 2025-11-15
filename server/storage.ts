@@ -61,6 +61,7 @@ export class DbStorage implements IStorage {
   // -----------------------------
   // CONTACTS
   // -----------------------------
+  // GET ALL CONTACTS
   async getContacts(): Promise<ContactType[]> {
     const contacts = await Contact.find().sort({ createdAt: -1 }).lean();
     return contacts.map(c => ({
@@ -68,21 +69,24 @@ export class DbStorage implements IStorage {
       name: c.name,
       email: c.email,
       message: c.message,
-      createdAt: c.createdAt
+      createdAt: c.createdAt,
     }));
   }
 
+  // CREATE CONTACT
   async createContact(contact: InsertContact): Promise<ContactType> {
     const newContact = new Contact(contact);
     const saved = await newContact.save();
+
     return {
       _id: saved._id.toString(),
       name: saved.name,
       email: saved.email,
       message: saved.message,
-      createdAt: saved.createdAt
+      createdAt: saved.createdAt,
     };
   }
+
 
   // -----------------------------
   // SPONSORS
