@@ -3,9 +3,9 @@ import { Github, Linkedin, Instagram, Heart, Mail, ArrowUp } from "lucide-react"
 
 const Footer = () => {
   const socialLinks = [
-    { icon: Github, href: "https://github.com", label: "GitHub", color: "from-primary to-primary/50" },
-    { icon: Linkedin, href: "https://linkedin.com", label: "LinkedIn", color: "from-secondary to-secondary/50" },
-    { icon: Instagram, href: "https://instagram.com", label: "Instagram", color: "from-accent to-accent/50" },
+    { icon: Github, href: "https://github.com/Prash9-coder", label: "GitHub", color: "from-primary to-primary/50" },
+    { icon: Linkedin, href: "https://www.linkedin.com/in/nimmala-prashanth/", label: "LinkedIn", color: "from-secondary to-secondary/50" },
+    // { icon: Instagram, href: "https://instagram.com", label: "Instagram", color: "from-accent to-accent/50" },
   ];
 
   const scrollToTop = () => {
