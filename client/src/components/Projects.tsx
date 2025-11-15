@@ -33,7 +33,7 @@ const Projects = () => {
       opacity: 1,
       rotateY: 0,
       y: 0,
-      transition: { duration: 0.6, type: "spring" },
+      transition: { duration: 0.6, type: "spring" as const },
     },
   };
 

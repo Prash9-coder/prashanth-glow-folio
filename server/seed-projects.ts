@@ -152,6 +152,30 @@ const projectsData = [
         imageUrl: "https://via.placeholder.com/600x400?text=Web+Milestones",
         githubUrl: "https://github.com/Prash9-coder/web-milestone-2",
         techStack: ["JavaScript", "HTML", "CSS", "Web Development"]
+    },
+    {
+        title: "AI Post Generator",
+        description: "An AI-powered tool that generates engaging social media posts with intelligent content creation and optimization.",
+        imageUrl: "https://via.placeholder.com/600x400?text=AI+Post+Generator",
+        demoUrl: "https://ai-post-generator-sage.vercel.app",
+        githubUrl: "https://github.com/Prash9-coder/ai-post-generator",
+        techStack: ["JavaScript", "AI/ML", "React", "API Integration"],
+        featured: true
+    },
+    {
+        title: "AndroRAT",
+        description: "An Android Remote Access Trojan for educational and security research purposes. Demonstrates mobile security concepts and reverse engineering.",
+        imageUrl: "https://via.placeholder.com/600x400?text=AndroRAT",
+        githubUrl: "https://github.com/Prash9-coder/AndroRAT",
+        techStack: ["Java", "Android", "Security", "Mobile Development"]
+    },
+    {
+        title: "Crypton Watch",
+        description: "A cryptocurrency tracking application providing real-time market data, price monitoring, and portfolio management features.",
+        imageUrl: "https://via.placeholder.com/600x400?text=Crypton+Watch",
+        githubUrl: "https://github.com/Prash9-coder/crypton-watch",
+        techStack: ["TypeScript", "React", "API Integration", "Finance"],
+        featured: true
     }
 ];
 

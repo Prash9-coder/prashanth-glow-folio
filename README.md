@@ -1,18 +1,13 @@
-# Welcome to your Lovable project
+# Welcome to my portfolio project
 
 ## Project info
 
-**URL**: https://lovable.dev/projects/4b02eaa4-bc25-4268-82e1-0c9f6ce3c1c1
+**URL**: https://prashanth-port-folio.vercel.app/
 
 ## How can I edit this code?
 
 There are several ways of editing your application.
 
-**Use Lovable**
-
-Simply visit the [Lovable Project](https://lovable.dev/projects/4b02eaa4-bc25-4268-82e1-0c9f6ce3c1c1) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
 
 **Use your preferred IDE**
 
