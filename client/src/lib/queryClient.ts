@@ -1,21 +1,29 @@
 import { QueryClient } from "@tanstack/react-query";
 
-const API_BASE =
-  import.meta.env.VITE_API_URL ||
-  "https://prashanth-glow-folio.onrender.com";
+const API_BASE = import.meta.env.VITE_API_URL
+  ? import.meta.env.VITE_API_URL.replace(/\/$/, "")
+  : "https://prashanth-glow-folio.onrender.com";
 
-// Throw helper
+// Throw error if response is not OK
 async function throwIfResNotOk(res: Response) {
-  if (!res.ok) throw new Error(await res.text());
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`Request failed: ${res.status} ${body}`);
+  }
 }
 
-// Generic API request
-export async function apiRequest(method: string, url: string, data?: any) {
-  const fullUrl = API_BASE + url;
+// Generic API request wrapper
+export async function apiRequest(
+  method: string,
+  url: string,
+  data?: unknown
+): Promise<Response> {
+
+  const fullUrl = `${API_BASE}${url.startsWith("/") ? url : "/" + url}`;
 
   const res = await fetch(fullUrl, {
     method,
-    headers: { "Content-Type": "application/json" },
+    headers: data ? { "Content-Type": "application/json" } : {},
     body: data ? JSON.stringify(data) : undefined,
   });
 
@@ -23,10 +31,11 @@ export async function apiRequest(method: string, url: string, data?: any) {
   return res;
 }
 
-// Query function
-const defaultQueryFn = async ({ queryKey }: { queryKey: readonly any[] }) => {
-  const path = queryKey[0] as string; // example: "/api/projects"
-  const res = await fetch(API_BASE + path);
+// Default queryFn for React Query
+const defaultQueryFn = async ({ queryKey }: { queryKey: readonly unknown[] }) => {
+  const path = queryKey[0] as string;
+  const fullUrl = `${API_BASE}${path}`;
+  const res = await fetch(fullUrl);
   await throwIfResNotOk(res);
   return res.json();
 };
@@ -35,8 +44,8 @@ export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       queryFn: defaultQueryFn,
-      retry: false,
       refetchOnWindowFocus: false,
+      retry: false,
       staleTime: 5 * 60 * 1000,
     },
   },

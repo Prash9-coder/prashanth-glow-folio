@@ -7,7 +7,7 @@ import { connectDB } from "./db";
 
 const app = express();
 
-// Middleware
+// Body parser
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -18,7 +18,6 @@ const allowedOrigins = [
   "http://localhost:3000",
 ];
 
-// CORS
 app.use(
   cors({
     origin: (origin, callback) => {
@@ -28,18 +27,18 @@ app.use(
       console.log("❌ BLOCKED ORIGIN:", origin);
       return callback(new Error("Not allowed by CORS"));
     },
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization", "Accept"],
     credentials: true,
   })
 );
 
-// Preflight handler — IMPORTANT FIX
-app.options("/api/*", (_req, res) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");
+// ⭐ EXPRESS 5 SAFE OPTIONS Route (NO wildcards)
+app.options(/^\/api\/.*$/, (req, res) => {
+  res.setHeader("Access-Control-Allow-Origin", req.headers.origin || "*");
   res.setHeader(
     "Access-Control-Allow-Methods",
-    "GET, POST, PUT, PATCH, DELETE, OPTIONS"
+    "GET,POST,PUT,DELETE,PATCH,OPTIONS"
   );
   res.setHeader(
     "Access-Control-Allow-Headers",
@@ -51,25 +50,24 @@ app.options("/api/*", (_req, res) => {
 (async () => {
   try {
     await connectDB();
-
     console.log("REGISTER ROUTES CALLED");
+
     registerRoutes(app);
 
-    // API fallback (no wildcard crash)
-    app.use("/api", (_req, res) => {
-      res.status(404).json({ error: "API route not found" });
+    // API fallback (Express 5 SAFE REGEX, no wildcards)
+    app.use(/^\/api\/.*$/, (req, res) => {
+      return res.status(404).json({ error: "API route not found" });
     });
 
-    // Attach Vite LAST
+    // Vite must be attached LAST
     await setupVite(app);
 
-    const PORT = Number(process.env.PORT) || 10000;
-
+    const PORT = Number(process.env.PORT) || 5000;
     app.listen(PORT, "0.0.0.0", () => {
       log(`🔥 Server running on port ${PORT}`);
     });
   } catch (err) {
-    console.error("❌ Server startup failed:", err);
+    console.error("❌ Failed to start server:", err);
     process.exit(1);
   }
 })();

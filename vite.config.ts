@@ -9,7 +9,7 @@ export default defineConfig(({ mode, command }) => ({
   cacheDir: "../node_modules/.vite",
   plugins: [react()],
   server: {
-    allowedHosts: ["prashanth-glow-folio.onrender.com"],
+    allowedHosts: ["prashanth-glow-folio.onrender.com", "prashanth-port-folio.vercel.app"],
   },
   resolve: {
     alias: {
