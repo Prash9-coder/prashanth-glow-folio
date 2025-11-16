@@ -1,0 +1,7 @@
+{
+  "scripts": {
+    "dev": "tsx server/index.ts",
+    "start": "node dist/server/index.js",
+    "build": "npm --prefix client run build && tsc -p tsconfig.server.json"
+  }
+}
