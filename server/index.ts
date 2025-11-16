@@ -33,8 +33,8 @@ app.use(
   })
 );
 
-// 🟢 FIX: Express 5 safe OPTIONS handler
-app.options("/api/*", (req, res) => {
+// ⭐ EXPRESS 5 SAFE OPTIONS Route (NO wildcards)
+app.options(/^\/api\/.*$/, (req, res) => {
   res.setHeader("Access-Control-Allow-Origin", req.headers.origin || "*");
   res.setHeader(
     "Access-Control-Allow-Methods",
@@ -54,12 +54,12 @@ app.options("/api/*", (req, res) => {
 
     registerRoutes(app);
 
-    // API fallback
-    app.use("/api/*", (req, res) => {
+    // API fallback (Express 5 SAFE REGEX, no wildcards)
+    app.use(/^\/api\/.*$/, (req, res) => {
       return res.status(404).json({ error: "API route not found" });
     });
 
-    // Attach Vite LAST
+    // Vite must be attached LAST
     await setupVite(app);
 
     const PORT = Number(process.env.PORT) || 5000;
