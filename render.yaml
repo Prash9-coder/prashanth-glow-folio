@@ -1,9 +1,22 @@
 services:
   - type: web
-    name: prashanth-glow-folio
+    name: prashanth-portfolio-backend
     env: node
-    buildCommand: bun install && bun run build
-    startCommand: bun run start
+    region: singapore
+    plan: free
+    rootDir: server
+    buildCommand: npm install && npm run build
+    startCommand: npm start
     envVars:
       - key: NODE_ENV
         value: production
+      - key: PORT
+        value: 5000
+      - key: MONGODB_URI
+        sync: false
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASS
+        sync: false
+      - key: NOTIFY_EMAIL
+        sync: false

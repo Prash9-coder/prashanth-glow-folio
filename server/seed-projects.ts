@@ -1,8 +1,8 @@
 import mongoose from 'mongoose';
-import { Project } from '@shared/schema';
+import { Project } from '../shared/schema.js'; // ✅ Fixed import
 import dotenv from 'dotenv';
 
-dotenv.config();
+dotenv.config({ path: '../.env' }); // ✅ Load .env from root
 
 // Your GitHub projects data
 const projectsData = [
@@ -183,24 +183,29 @@ async function seedProjects() {
     try {
         const mongoUri = process.env.MONGODB_URI;
         if (!mongoUri) {
-            throw new Error("MONGODB_URI environment variable is not set");
+            throw new Error("❌ MONGODB_URI environment variable is not set");
         }
 
+        console.log("🔌 Connecting to MongoDB...");
         await mongoose.connect(mongoUri);
-        console.log("Connected to MongoDB");
+        console.log("✅ Connected to MongoDB");
 
+        console.log("🗑️  Clearing existing projects...");
         await Project.deleteMany({});
-        console.log("Cleared existing projects");
+        console.log("✅ Cleared existing projects");
 
+        console.log("📦 Inserting new projects...");
         const savedProjects = await Project.insertMany(projectsData);
-        console.log(`✅ Successfully seeded ${savedProjects.length} projects`);
+        console.log(`✅ Successfully seeded ${savedProjects.length} projects\n`);
 
+        console.log("📋 Project List:");
         savedProjects.forEach((project, index) =>
-            console.log(`${index + 1}. ${project.title}`)
+            console.log(`   ${index + 1}. ${project.title}${project.featured ? ' ⭐' : ''}`)
         );
 
         await mongoose.disconnect();
-        console.log("Seed completed successfully!");
+        console.log("\n✅ Seed completed successfully!");
+        process.exit(0);
     } catch (error) {
         console.error("❌ Error seeding projects:", error);
         process.exit(1);

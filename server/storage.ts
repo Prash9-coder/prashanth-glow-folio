@@ -5,9 +5,9 @@ import type {
   Contact as ContactType,
   InsertSponsor,
   Sponsor as SponsorType
-} from "@shared/schema";
+} from "../shared/schema.js"; // ✅ Fixed import path
 
-import { Project, Contact, Sponsor } from "@shared/schema";
+import { Project, Contact, Sponsor } from "../shared/schema.js"; // ✅ Fixed import path
 
 export interface IStorage {
   // Projects
@@ -28,18 +28,23 @@ export class DbStorage implements IStorage {
   // PROJECTS
   // -----------------------------
   async getProjects(): Promise<ProjectType[]> {
-    const projects = await Project.find().sort({ createdAt: -1 }).lean();
-    return projects.map(project => ({
-      _id: project._id.toString(),
-      title: project.title,
-      description: project.description,
-      imageUrl: project.imageUrl,
-      demoUrl: project.demoUrl,
-      githubUrl: project.githubUrl,
-      techStack: project.techStack,
-      featured: project.featured,
-      createdAt: project.createdAt
-    }));
+    try {
+      const projects = await Project.find().sort({ createdAt: -1 }).lean();
+      return projects.map(project => ({
+        _id: project._id.toString(),
+        title: project.title,
+        description: project.description,
+        imageUrl: project.imageUrl,
+        demoUrl: project.demoUrl,
+        githubUrl: project.githubUrl,
+        techStack: project.techStack,
+        featured: project.featured,
+        createdAt: project.createdAt
+      }));
+    } catch (error) {
+      console.error("❌ Error fetching projects:", error);
+      return [];
+    }
   }
 
   async createProject(project: InsertProject): Promise<ProjectType> {
@@ -61,19 +66,22 @@ export class DbStorage implements IStorage {
   // -----------------------------
   // CONTACTS
   // -----------------------------
-  // GET ALL CONTACTS
   async getContacts(): Promise<ContactType[]> {
-    const contacts = await Contact.find().sort({ createdAt: -1 }).lean();
-    return contacts.map(c => ({
-      _id: c._id.toString(),
-      name: c.name,
-      email: c.email,
-      message: c.message,
-      createdAt: c.createdAt,
-    }));
+    try {
+      const contacts = await Contact.find().sort({ createdAt: -1 }).lean();
+      return contacts.map(c => ({
+        _id: c._id.toString(),
+        name: c.name,
+        email: c.email,
+        message: c.message,
+        createdAt: c.createdAt,
+      }));
+    } catch (error) {
+      console.error("❌ Error fetching contacts:", error);
+      return [];
+    }
   }
 
-  // CREATE CONTACT
   async createContact(contact: InsertContact): Promise<ContactType> {
     const newContact = new Contact(contact);
     const saved = await newContact.save();
@@ -87,19 +95,23 @@ export class DbStorage implements IStorage {
     };
   }
 
-
   // -----------------------------
   // SPONSORS
   // -----------------------------
   async getSponsors(): Promise<SponsorType[]> {
-    const sponsors = await Sponsor.find().sort({ createdAt: -1 }).lean();
-    return sponsors.map(s => ({
-      _id: s._id.toString(),
-      donorName: s.donorName,
-      message: s.message,
-      amount: s.amount,
-      createdAt: s.createdAt
-    }));
+    try {
+      const sponsors = await Sponsor.find().sort({ createdAt: -1 }).lean();
+      return sponsors.map(s => ({
+        _id: s._id.toString(),
+        donorName: s.donorName,
+        message: s.message,
+        amount: s.amount,
+        createdAt: s.createdAt
+      }));
+    } catch (error) {
+      console.error("❌ Error fetching sponsors:", error);
+      return [];
+    }
   }
 
   async createSponsor(sponsor: InsertSponsor): Promise<SponsorType> {

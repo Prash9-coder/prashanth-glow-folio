@@ -1,19 +1,20 @@
 import type { Express } from "express";
-import { storage } from "./storage";
+import { storage } from "./storage.js";
 import {
   insertProjectSchema,
   insertContactSchema,
   insertSponsorSchema,
   Project,
-} from "@shared/schema";
+} from "../shared/schema.js"; // ✅ Fixed
 import nodemailer from "nodemailer";
 
 export function registerRoutes(app: Express) {
-  // Debug
+  // Debug endpoint
   app.get("/api/debug", (req, res) => {
     res.json({
       mongodbUri: process.env.MONGODB_URI ? "Set" : "Not set",
       nodeEnv: process.env.NODE_ENV,
+      smtpConfigured: !!(process.env.SMTP_USER && process.env.SMTP_PASS),
       timestamp: new Date().toISOString(),
     });
   });
@@ -24,19 +25,11 @@ export function registerRoutes(app: Express) {
       const projectsData = [
         {
           title: "Glow Folio",
-          description:
-            "A modern portfolio built with React, TypeScript & Tailwind.",
+          description: "A modern portfolio built with React, TypeScript & Tailwind.",
           imageUrl: "https://via.placeholder.com/600x400?text=Glow+Folio",
           demoUrl: "https://prashanth-glow-folio.vercel.app",
           githubUrl: "https://github.com/Prash9-coder/prashanth-glow-folio",
-          techStack: [
-            "React",
-            "TypeScript",
-            "Tailwind",
-            "Framer Motion",
-            "Express",
-            "MongoDB",
-          ],
+          techStack: ["React", "TypeScript", "Tailwind", "Framer Motion", "Express", "MongoDB"],
           featured: true,
         },
         {
@@ -56,8 +49,9 @@ export function registerRoutes(app: Express) {
         count: saved.length,
         message: "Seeded projects successfully",
       });
-    } catch (e) {
-      res.status(500).json({ error: "Failed to seed projects" });
+    } catch (e: any) {
+      console.error("Seed error:", e);
+      res.status(500).json({ error: e.message || "Failed to seed projects" });
     }
   });
 
@@ -66,8 +60,9 @@ export function registerRoutes(app: Express) {
     try {
       const items = await storage.getProjects();
       res.json(items);
-    } catch (e) {
-      res.status(500).json({ error: "Failed to fetch projects" });
+    } catch (e: any) {
+      console.error("Get projects error:", e);
+      res.status(500).json({ error: e.message || "Failed to fetch projects" });
     }
   });
 
@@ -77,8 +72,9 @@ export function registerRoutes(app: Express) {
       const validated = insertProjectSchema.parse(req.body);
       const item = await storage.createProject(validated);
       res.status(201).json(item);
-    } catch (e) {
-      res.status(400).json({ error: "Invalid project data" });
+    } catch (e: any) {
+      console.error("Create project error:", e);
+      res.status(400).json({ error: e.message || "Invalid project data" });
     }
   });
 
@@ -87,58 +83,57 @@ export function registerRoutes(app: Express) {
     try {
       const items = await storage.getContacts();
       res.json(items);
-    } catch (e) {
-      res.status(500).json({ error: "Failed to fetch contacts" });
+    } catch (e: any) {
+      console.error("Get contacts error:", e);
+      res.status(500).json({ error: e.message || "Failed to fetch contacts" });
     }
   });
 
   // CREATE CONTACT
-  // CONTACTS ROUTE (FULLY FIXED)
   app.post("/api/contacts", async (req, res) => {
-    console.log("Incoming Contact Body:", req.body);
+    console.log("📧 Incoming Contact Request:", req.body);
 
     try {
       const validatedData = insertContactSchema.parse(req.body);
-
       const contact = await storage.createContact(validatedData);
 
-      // -----------------------------
-      // EMAIL NOTIFICATION
-      // -----------------------------
-      const transporter = nodemailer.createTransport({
-        service: "gmail",
-        auth: {
-          user: process.env.SMTP_USER,
-          pass: process.env.SMTP_PASS,
-        },
-      });
+      // Email notification
+      if (process.env.SMTP_USER && process.env.SMTP_PASS) {
+        try {
+          const transporter = nodemailer.createTransport({
+            service: "gmail",
+            auth: {
+              user: process.env.SMTP_USER,
+              pass: process.env.SMTP_PASS,
+            },
+          });
 
-      const mailOptions = {
-        from: `"Portfolio Contact" <${process.env.SMTP_USER}>`,
-        to: process.env.NOTIFY_EMAIL,
-        subject: `New Contact Request from ${contact.name}`,
-        text: `
-New Contact Request
+          const mailOptions = {
+            from: `"Portfolio Contact" <${process.env.SMTP_USER}>`,
+            to: process.env.NOTIFY_EMAIL || process.env.SMTP_USER,
+            subject: `New Contact from ${contact.name}`,
+            html: `
+              <h2>New Contact Request</h2>
+              <p><strong>Name:</strong> ${contact.name}</p>
+              <p><strong>Email:</strong> ${contact.email}</p>
+              <p><strong>Message:</strong> ${contact.message}</p>
+              <hr>
+              <p><small>Sent at: ${new Date().toLocaleString()}</small></p>
+            `,
+          };
 
-Name: ${contact.name}
-Email: ${contact.email}
-Message: ${contact.message}
-      `,
-        html: `
-        <h2>New Contact Request</h2>
-        <p><strong>Name:</strong> ${contact.name}</p>
-        <p><strong>Email:</strong> ${contact.email}</p>
-        <p><strong>Message:</strong> ${contact.message}</p>
-      `,
-      };
-
-      await transporter.sendMail(mailOptions);
+          await transporter.sendMail(mailOptions);
+          console.log("✅ Email notification sent");
+        } catch (emailError) {
+          console.error("⚠️ Email send failed:", emailError);
+          // Don't fail the request if email fails
+        }
+      }
 
       return res.status(201).json({ success: true, contact });
-
-    } catch (error) {
-      console.error("Error creating contact:", error);
-      res.status(400).json({ error: "Invalid contact data" });
+    } catch (error: any) {
+      console.error("❌ Contact creation error:", error);
+      res.status(400).json({ error: error.message || "Invalid contact data" });
     }
   });
 
@@ -147,8 +142,9 @@ Message: ${contact.message}
     try {
       const items = await storage.getSponsors();
       res.json(items);
-    } catch (e) {
-      res.status(500).json({ error: "Failed to fetch sponsors" });
+    } catch (e: any) {
+      console.error("Get sponsors error:", e);
+      res.status(500).json({ error: e.message || "Failed to fetch sponsors" });
     }
   });
 
@@ -158,8 +154,9 @@ Message: ${contact.message}
       const validated = insertSponsorSchema.parse(req.body);
       const item = await storage.createSponsor(validated);
       res.status(201).json(item);
-    } catch (e) {
-      res.status(400).json({ error: "Invalid sponsor data" });
+    } catch (e: any) {
+      console.error("Create sponsor error:", e);
+      res.status(400).json({ error: e.message || "Invalid sponsor data" });
     }
   });
 }
