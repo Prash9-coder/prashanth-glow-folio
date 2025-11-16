@@ -19,7 +19,7 @@ const App = () => (
       <Navbar />
       <Switch>
         <Route path="/" component={Index} />
-        <Route path="/projects" component={AllProjects} />
+        <Route path="/all-projects" component={AllProjects} />
         <Route component={NotFound} />
       </Switch>
     </TooltipProvider>
