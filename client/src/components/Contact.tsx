@@ -14,9 +14,16 @@ const Contact = () => {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
 
+  // FIXED MUTATION
   const createContact = useMutation({
-    mutationFn: async (data: { name: string; email: string; message: string }) => {
-      await apiRequest("POST", "/api/contacts", data);
+    mutationFn: async () => {
+      const cleanData = {
+        name: name.trim(),
+        email: email.trim(),
+        message: message.trim(),
+      };
+
+      return await apiRequest("POST", "/api/contacts", cleanData);
     },
     onSuccess: () => {
       toast.success("Message sent successfully! 🎉", {
@@ -33,11 +40,19 @@ const Contact = () => {
     },
   });
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  // FIXED HANDLER WITH VALIDATION
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    createContact.mutate({ name, email, message });
+
+    if (!name.trim() || !email.trim() || !message.trim()) {
+      toast.error("All fields are required!");
+      return;
+    }
+
+    createContact.mutate();
   };
 
+  // ICON DATA
   const contactItems = [
     {
       icon: Mail,
@@ -62,25 +77,6 @@ const Contact = () => {
     },
   ];
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-      },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.6 },
-    },
-  };
-
   return (
     <section id="contact" className="py-20 px-4 relative" data-testid="section-contact">
       <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent pointer-events-none" />
@@ -92,66 +88,8 @@ const Contact = () => {
         />
 
         <div className="grid md:grid-cols-2 gap-12 items-center">
-          {/* Contact Info */}
-          <motion.div
-            initial={{ opacity: 0, x: -50 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-          >
-            <motion.div
-              variants={containerVariants}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              className="space-y-6"
-            >
-              <div>
-                <h3 className="text-2xl font-semibold mb-2 gradient-text">Let's Talk</h3>
-                <p className="text-muted-foreground">
-                  I'm always open to discussing new projects, creative ideas, or opportunities to be part of your visions.
-                </p>
-              </div>
 
-              {contactItems.map((item, index) => (
-                <motion.a
-                  key={index}
-                  href={item.href || "#"}
-                  onClick={(e) => !item.href && e.preventDefault()}
-                  variants={itemVariants}
-                  whileHover={{ x: 10 }}
-                  className="flex items-center gap-4 glass-card-hover p-6 group cursor-pointer relative"
-                >
-                  {/* Icon Background */}
-                  <motion.div
-                    className={`w-14 h-14 rounded-xl bg-gradient-to-br ${item.color} flex items-center justify-center group-hover:shadow-2xl transition-all`}
-                    whileHover={{ rotate: 20, scale: 1.1 }}
-                  >
-                    <item.icon className="w-6 h-6 text-white" />
-                  </motion.div>
-
-                  {/* Content */}
-                  <div className="flex-1 group-hover:text-primary transition-colors">
-                    <p className="text-sm text-muted-foreground group-hover:text-muted-foreground/80 transition-colors">
-                      {item.label}
-                    </p>
-                    <p className="font-medium text-foreground">{item.value}</p>
-                  </div>
-
-                  {/* Arrow */}
-                  <motion.div
-                    className="text-primary opacity-0 group-hover:opacity-100 transition-opacity"
-                    animate={{ x: [0, 5, 0] }}
-                    transition={{ duration: 1.5, repeat: Infinity }}
-                  >
-                    →
-                  </motion.div>
-                </motion.a>
-              ))}
-            </motion.div>
-          </motion.div>
-
-          {/* Contact Form */}
+          {/* CONTACT FORM */}
           <motion.div
             initial={{ opacity: 0, x: 50 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -161,20 +99,14 @@ const Contact = () => {
             <form
               onSubmit={handleSubmit}
               className="glass-card-hover p-8 space-y-6 relative"
-              data-testid="form-contact"
             >
-              {/* Form Title */}
               <div className="mb-8">
                 <h4 className="text-xl font-semibold mb-2">Send me a message</h4>
                 <p className="text-sm text-muted-foreground">I'll respond as soon as possible</p>
               </div>
 
-              {/* Name Input */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 }}
-              >
+              {/* NAME */}
+              <div>
                 <label className="text-sm font-medium text-muted-foreground mb-2 block">
                   Your Name
                 </label>
@@ -183,17 +115,12 @@ const Contact = () => {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   required
-                  className="bg-background/50 border-white/10 focus:border-primary transition-colors"
-                  data-testid="input-name"
+                  className="bg-background/50 border-white/10 focus:border-primary"
                 />
-              </motion.div>
+              </div>
 
-              {/* Email Input */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-              >
+              {/* EMAIL */}
+              <div>
                 <label className="text-sm font-medium text-muted-foreground mb-2 block">
                   Your Email
                 </label>
@@ -203,17 +130,12 @@ const Contact = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="bg-background/50 border-white/10 focus:border-primary transition-colors"
-                  data-testid="input-email"
+                  className="bg-background/50 border-white/10 focus:border-primary"
                 />
-              </motion.div>
+              </div>
 
-              {/* Message Input */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-              >
+              {/* MESSAGE */}
+              <div>
                 <label className="text-sm font-medium text-muted-foreground mb-2 block">
                   Your Message
                 </label>
@@ -223,56 +145,25 @@ const Contact = () => {
                   onChange={(e) => setMessage(e.target.value)}
                   required
                   rows={5}
-                  className="bg-background/50 border-white/10 focus:border-primary transition-colors resize-none"
-                  data-testid="input-message"
+                  className="bg-background/50 border-white/10 focus:border-primary resize-none"
                 />
-              </motion.div>
+              </div>
 
-              {/* Submit Button */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 }}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
+              {/* SUBMIT BUTTON */}
+              <Button
+                type="submit"
+                disabled={createContact.isPending}
+                className="w-full bg-gradient-to-r from-primary to-secondary py-6 text-base font-medium"
               >
-                <Button
-                  type="submit"
-                  disabled={createContact.isPending}
-                  className="w-full bg-gradient-to-r from-primary to-secondary hover:opacity-90 transition-opacity glow-pulse py-6 text-base font-medium"
-                  data-testid="button-submit"
-                >
-                  <span className="flex items-center justify-center gap-2">
-                    {createContact.isPending ? (
-                      <>
-                        <motion.div
-                          animate={{ rotate: 360 }}
-                          transition={{ duration: 1, repeat: Infinity }}
-                        >
-                          ⏳
-                        </motion.div>
-                        Sending...
-                      </>
-                    ) : (
-                      <>
-                        <Send className="w-5 h-5" />
-                        Send Message
-                      </>
-                    )}
-                  </span>
-                </Button>
-              </motion.div>
+                {createContact.isPending ? "Sending..." : "Send Message"}
+              </Button>
 
-              {/* Success Message */}
+              {/* SUCCESS MESSAGE */}
               {createContact.isSuccess && (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="flex items-center gap-2 p-4 rounded-lg bg-green-500/10 border border-green-500/30 text-green-400"
-                >
+                <div className="flex items-center gap-2 p-4 rounded-lg bg-green-500/10 border border-green-500/30 text-green-400 mt-4">
                   <CheckCircle2 className="w-5 h-5" />
                   <span>Message sent successfully! I'll get back to you soon.</span>
-                </motion.div>
+                </div>
               )}
             </form>
           </motion.div>
