@@ -7,31 +7,35 @@ import { connectDB } from "./db";
 
 const app = express();
 
-// Body parser
+// ----------------------------------
+// 🟢 BODY PARSER (MUST BE FIRST)
+// ----------------------------------
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: true }));
 
-// ------------------------------
-// ✅ ALLOWED ORIGINS
-// ------------------------------
+// ----------------------------------
+// 🟢 ALLOWED FRONTEND ORIGINS
+// ----------------------------------
 const allowedOrigins = [
-  "https://prashanth-port-folio.vercel.app", // Production frontend
-  "http://localhost:5173",                   // Local development
-  "http://localhost:3000",
+  "https://prashanth-port-folio.vercel.app", // production
+  "http://localhost:5173",                   // dev
+  "http://localhost:3000"
 ];
 
-// ------------------------------
-// ✅ CORS FIXED COMPLETELY
-// ------------------------------
+// ----------------------------------
+// 🟢 FIXED CORS MIDDLEWARE
+// ----------------------------------
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        console.log("❌ BLOCKED ORIGIN:", origin);
-        callback(new Error("Not allowed by CORS"));
+      if (!origin) return callback(null, true); // allow tools like Postman
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
       }
+
+      console.log("❌ BLOCKED ORIGIN:", origin);
+      return callback(new Error("Not allowed by CORS"), false);
     },
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization", "Accept"],
@@ -39,28 +43,28 @@ app.use(
   })
 );
 
-// 🟢 Preflight OPTIONS support (Fixes CORS errors)
+// 🟢 Allow preflight OPTIONS requests
 app.options("*", cors());
 
-// ------------------------------
-// Start Server
-// ------------------------------
+// ----------------------------------
+// 🟢 START SERVER
+// ----------------------------------
 (async () => {
   try {
     await connectDB();
-
     console.log("REGISTER ROUTES CALLED");
+
+    // Register API routes
     registerRoutes(app);
 
     // API fallback
-    app.use((req, res, next) => {
-      if (req.path.startsWith("/api")) {
-        return res.status(404).json({ error: "API route not found" });
-      }
-      next();
+    app.use("/api/*", (req, res) => {
+      return res.status(404).json({ error: "API route not found" });
     });
 
-    // Vite must be attached last
+    // ----------------------------------
+    // 🟢 VITE MUST BE LAST — DEBUG FIX
+    // ----------------------------------
     await setupVite(app);
 
     const PORT = Number(process.env.PORT) || 5000;
@@ -69,7 +73,7 @@ app.options("*", cors());
       log(`🔥 Server running on port ${PORT}`);
     });
   } catch (err) {
-    console.error("Failed to start server:", err);
+    console.error("❌ Failed to start server:", err);
     process.exit(1);
   }
 })();
