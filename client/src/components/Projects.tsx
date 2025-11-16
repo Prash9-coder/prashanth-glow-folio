@@ -180,7 +180,7 @@ const Projects = () => {
           <Button
             size="lg"
             className="bg-gradient-to-r from-primary to-secondary hover:opacity-90 transition-opacity glow-pulse"
-            onClick={() => setLocation("/projects")}
+            onClick={() => setLocation("/all-projects")}
           >
             View All Projects
           </Button>

@@ -1,11 +1,18 @@
 // client/src/lib/api.ts
-export const API_BASE = import.meta.env.DEV
-    ? "http://localhost:5000"
-    : "https://prashanth-glow-folio.onrender.com";
+
+export const API_BASE =
+    import.meta.env.VITE_API_URL ||
+    "https://prashanth-glow-folio.onrender.com";
 
 export async function apiGet<T = any>(path: string): Promise<T> {
-    const res = await fetch(`${API_BASE}${path}`, {
-        headers: { "Content-Type": "application/json" },
+    const url = `${API_BASE}${path}`;
+    console.log("API GET:", url);
+
+    const res = await fetch(url, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+        },
     });
 
     if (!res.ok) {
