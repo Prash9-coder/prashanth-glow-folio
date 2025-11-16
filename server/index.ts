@@ -44,7 +44,7 @@ app.use(
 );
 
 // 🟢 Allow preflight OPTIONS requests
-app.options("*", cors());
+app.options("/api/*", cors());
 
 // ----------------------------------
 // 🟢 START SERVER
