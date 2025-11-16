@@ -1,7 +1,17 @@
 {
+  "name": "prashanth-glow-folio",
+  "version": "1.0.0",
+  "private": true,
   "scripts": {
-    "dev": "tsx server/index.ts",
-    "start": "node dist/server/index.js",
-    "build": "npm --prefix client run build && tsc -p tsconfig.server.json"
-  }
+    "dev": "cd server && npm run dev",
+    "build": "echo \"Root has no build\"",
+    "start": "echo \"Root has no start\""
+  },
+  "engines": {
+    "node": "18.x"
+  },
+  "workspaces": [
+    "client",
+    "server"
+  ]
 }

@@ -4,8 +4,9 @@ services:
     env: node
     region: singapore
     plan: free
-    buildCommand: npm install && npm run build
-    startCommand: npm start
+    buildCommand: "bun install"
+    startCommand: "bun --bun server/index.ts"
+
     envVars:
       - key: NODE_ENV
         value: production
