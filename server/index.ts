@@ -11,42 +11,36 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Allowed origins
+// Allowed Frontend URLs
 const allowedOrigins = [
   "https://prashanth-port-folio.vercel.app",
   "http://localhost:5173",
   "http://localhost:3000",
 ];
 
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      }
-      console.log("❌ BLOCKED ORIGIN:", origin);
-      return callback(new Error("Not allowed by CORS"));
-    },
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization", "Accept"],
-    credentials: true,
-  })
-);
+// CORS middleware
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
 
-// ⭐ EXPRESS 5 SAFE OPTIONS Route (NO wildcards)
-app.options(/^\/api\/.*$/, (req, res) => {
-  res.setHeader("Access-Control-Allow-Origin", req.headers.origin || "*");
-  res.setHeader(
-    "Access-Control-Allow-Methods",
-    "GET,POST,PUT,DELETE,PATCH,OPTIONS"
-  );
-  res.setHeader(
-    "Access-Control-Allow-Headers",
-    "Content-Type, Authorization, Accept"
-  );
-  res.sendStatus(200);
+  if (origin && allowedOrigins.includes(origin)) {
+    res.setHeader("Access-Control-Allow-Origin", origin);
+  }
+
+  res.setHeader("Access-Control-Allow-Credentials", "true");
+  res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,PATCH,OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, Accept");
+
+  // Handle OPTIONS preflight
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(200);
+  }
+
+  next();
 });
 
+// ----------------------
+// Connect Database
+// ----------------------
 (async () => {
   try {
     await connectDB();
@@ -54,12 +48,12 @@ app.options(/^\/api\/.*$/, (req, res) => {
 
     registerRoutes(app);
 
-    // API fallback (Express 5 SAFE REGEX, no wildcards)
-    app.use(/^\/api\/.*$/, (req, res) => {
-      return res.status(404).json({ error: "API route not found" });
+    // API fallback
+    app.use("/api/*", (req, res) => {
+      res.status(404).json({ error: "API route not found" });
     });
 
-    // Vite must be attached LAST
+    // Vite (static hosting)
     await setupVite(app);
 
     const PORT = Number(process.env.PORT) || 5000;
